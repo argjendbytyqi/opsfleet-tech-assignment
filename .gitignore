@@ -1,0 +1,17 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files (These contain secrets! Use a remote backend instead)
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+
+# Exclude any .tfvars files that might contain sensitive data
+*.tfvars
+*.tfvars.json
+
+# Ignore override files
+override.tf
+override.tf.json
