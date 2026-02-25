@@ -10,6 +10,7 @@ This document outlines the architectural strategy for Innovate Inc.’s web appl
 To support Innovate Inc.’s growth and security requirements, we recommend a **multi-account strategy** managed via **AWS Control Tower**. This creates a **Landing Zone** that separates administrative overhead, development, and live production traffic.
 
 
+
 ### AWS Services (tools)
 
 - **AWS Organizations**
@@ -105,5 +106,40 @@ We have designed a VPC across three Availability Zones (AZs) to ensure high avai
 ### Disaster Recovery
 - Automated daily snapshots with a **35-day retention period**
 - Cross-region replication
+
+---
+
+## 7. CI/CD & Deployment
+
+We aim for **Continuous Delivery** using **GitHub Actions** and **Helm**.
+
+### Continuous Integration (CI)
+- Code is tested on every change.
+- The application is built into a **multi-arch Docker image** (`amd64` + `arm64`).
+- The image is pushed to **Amazon ECR**.
+
+### Continuous Delivery (CD)
+- **Helm** deploys the new release to **EKS**.
+- Helm triggers a **Rolling Update**.
+- Kubernetes confirms the new version is healthy before terminating the old one, ensuring **zero downtime** for users.
+
+---
+
+## 8. Scalability Strategy: From 100 to 1,000,000 Users
+
+This architecture is designed to be **elastic**, meaning it scales with traffic and **only costs what is necessary** for the current load.
+
+### Cost-Efficiency at Start
+- On Day 1, **Karpenter** provisions minimal, low-cost **Graviton** instances.
+- We avoid over-provisioning by scaling only when metrics (CPU/RAM) demand it.
+
+### Traffic Spike Resilience
+- During rapid growth, **AWS CloudFront** caches the React SPA globally.
+- This prevents millions of requests from reaching the backend.
+
+### Database Survivability
+- As traffic hits the millions:
+  - **Amazon RDS Proxy** prevents PostgreSQL connection exhaustion.
+  - **Read Replicas** offload read-heavy query volume from the primary database instance.
 
 ---
